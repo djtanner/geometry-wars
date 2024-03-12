@@ -10,7 +10,7 @@ void EntityManager::update()
     for (auto e : m_entitiesToAdd)
     {
         m_entities.push_back(e);
-        m_entityMap[tag].push_back(entity);
+        // m_entityMap[tag].push_back(entity);
     }
 
     m_entitiesToAdd.clear();

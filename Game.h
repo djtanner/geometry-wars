@@ -34,7 +34,7 @@ class Game
     BulletConfig m_bulletConfig;
     int m_score = 0;
     int m_currentFrame = 0;
-    in m_lastEnemySpawnTime = 0;
+    int m_lastEnemySpawnTime = 0;
     bool m_paused = false; // whether we update game logic
     bool m_running = true; // whether we continue to run the game loop
 
