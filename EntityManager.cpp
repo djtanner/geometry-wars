@@ -9,7 +9,7 @@ EntityManager::EntityManager()
 void EntityManager::update()
 {
     // add entities from m_entitiesToAdd to the proper locations
-    // add them to the vectgor of all entiteis
+    // add them to the vector of all entiteis
     // add them to the vector inside the map with the tag as the key
 
     for (auto e : m_entitiesToAdd)
@@ -33,14 +33,11 @@ void EntityManager::update()
 void EntityManager::removeDeadEntities(EntityVec &vec)
 {
 
-    for (auto e : vec)
-    {
-        if (!e->isActive())
-        {
-            // use removeif to remove the entity from the vector
-            std::cout << "Removing entity with id: " << e->id() << std::endl;
-        }
-    }
+    // use removeif to remove the entity from the vector
+
+    vec.erase(std::remove_if(vec.begin(), vec.end(), [](const std::shared_ptr<Entity> &e)
+                             { return !e->isActive(); }),
+              vec.end());
 }
 
 std::shared_ptr<Entity> EntityManager::addEntity(const std::string &tag)
