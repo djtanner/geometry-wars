@@ -91,9 +91,8 @@ void Game::spawnEnemy()
 
     // hardcode example for now
     entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(1.0f, 1.0f), 0.0f);
-
     entity->cShape = std::make_shared<CShape>(32.0f, 8, sf::Color(10, 10, 10), sf::Color(0, 0, 255), 4.0f);
-
+    entity->cCollision = std::make_shared<CCollision>(32.0f);
     // record when the most recent enemy was spawned
     m_lastEnemySpawnTime = m_currentFrame;
 }
@@ -125,6 +124,7 @@ void Game::spawnBullet(std::shared_ptr<Entity> e, const Vec2 &target)
     bullet->cTransform = std::make_shared<CTransform>(m_player->cTransform->pos, dir * 0.02, 0.0f);
     bullet->cShape = std::make_shared<CShape>(8.0f, 8, sf::Color(255, 255, 255), sf::Color(0, 255, 0), 4.0f);
     bullet->cLifespan = std::make_shared<CLifespan>(60);
+    bullet->cCollision = std::make_shared<CCollision>(8.0f);
 }
 
 // spawn a special weapon from the entity
@@ -210,20 +210,20 @@ void Game::sLifespan()
 void Game::sCollision()
 {
 
-    /**  for (auto b : m_entities.getEntities("bullet"))
-       {
-           for (auto e : m_entities.getEntities("enemy"))
-           {
-               // check if circles are overlapping for collisions
-               if (b->cTransform->pos.dist(e->cTransform->pos) < b->cShape->radius + e->cShape->radius)
-               {
-                   // call onCollision for both entities
-                   // destroy both entities
-                   b->destroy();
-                   e->destroy();
-               }
-           }
-       }*/
+    for (auto b : m_entities.getEntities("bullet"))
+    {
+        for (auto e : m_entities.getEntities("enemy"))
+        {
+            // check if circles are overlapping for collisions
+            if (b->cTransform->pos.dist(e->cTransform->pos) < b->cCollision->radius + e->cCollision->radius)
+            {
+                // call onCollision for both entities
+                // destroy both entities
+                b->destroy();
+                e->destroy();
+            }
+        }
+    }
     // to do: update the collision of all entities
     // use collision  radius, not shape radius
     // for all entities:
