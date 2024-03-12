@@ -82,6 +82,8 @@ void Game::spawnPlayer()
 // spawn enemy at random position
 void Game::spawnEnemy()
 {
+    std::cout << "Spawning enemy" << std::endl;
+
     auto entity = m_entities.addEntity("enemy");
     // spawn enemy within bounds of window
     float ex = rand() % m_window.getSize().x;
@@ -91,6 +93,7 @@ void Game::spawnEnemy()
     entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(1.0f, 1.0f), 0.0f);
 
     entity->cShape = std::make_shared<CShape>(32.0f, 8, sf::Color(10, 10, 10), sf::Color(0, 0, 255), 4.0f);
+
     // record when the most recent enemy was spawned
     m_lastEnemySpawnTime = m_currentFrame;
 }
@@ -184,7 +187,8 @@ void Game::sEnemySpawner()
     // to do: update the enemy spawner
     // if the current frame is greater than the last enemy spawn time + the spawn interval, spawn an enemy
     // use m_currentFrame - m_lastEnemySpawnTime to determine how long since last spawn
-    if (m_currentFrame - m_lastEnemySpawnTime > 60 * 5)
+    // spawning every 3 seconds at 60 fps
+    if (m_currentFrame - m_lastEnemySpawnTime > 3 * 60)
         spawnEnemy();
 }
 
@@ -202,17 +206,17 @@ void Game::sRender()
     m_window.draw(m_player->cShape->circle);
 
     // need to add all entities
-    /*  for (auto e : m_entities.getEntities())
-      {
-          e->cShape->circle.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
+    for (auto e : m_entities.getEntities())
+    {
+        e->cShape->circle.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
 
-          // set rotation and shape based on transform angle
-          e->cTransform->angle += 1.0f;
-          e->cShape->circle.setRotation(e->cTransform->angle);
+        // set rotation and shape based on transform angle
+        e->cTransform->angle += 1.0f;
+        e->cShape->circle.setRotation(e->cTransform->angle);
 
-          m_window.draw(e->cShape->circle);
-      }
-  */
+        m_window.draw(e->cShape->circle);
+    }
+
     // draw the entities sf circle shape
 
     m_window.display();
