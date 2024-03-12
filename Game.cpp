@@ -77,6 +77,8 @@ void Game::spawnPlayer()
 
     entity->cInput = std::make_shared<CInput>();
 
+    entity->cScore = std::make_shared<CScore>(0);
+
     m_player = entity;
 }
 
@@ -93,6 +95,7 @@ void Game::spawnEnemy()
     entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(1.0f, 1.0f), 0.0f);
     entity->cShape = std::make_shared<CShape>(32.0f, 8, sf::Color(10, 10, 10), sf::Color(0, 0, 255), 4.0f);
     entity->cCollision = std::make_shared<CCollision>(32.0f);
+    entity->cScore = std::make_shared<CScore>(10);
     // record when the most recent enemy was spawned
     m_lastEnemySpawnTime = m_currentFrame;
 }
@@ -101,9 +104,10 @@ void Game::spawnEnemy()
 void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
 {
     // to do: spawn small enemies around the position of the big enemy
+    std::cout << "Spawning small enemies" << std::endl;
 
-    // when create the smaller enemy, read teh values of the original enemy
-    // sapwn a number of small enemies equal to the verticies of the original enemy
+    // when create the smaller enemy, read the values of the original enemy
+    // spawn a number of small enemies equal to the vertices of the original enemy
     // set each to same color ,half the size
     // worth double points
 }
@@ -214,13 +218,24 @@ void Game::sCollision()
     {
         for (auto e : m_entities.getEntities("enemy"))
         {
+            if (!e->cCollision)
+            {
+                continue;
+            }
+
             // check if circles are overlapping for collisions
             if (b->cTransform->pos.dist(e->cTransform->pos) < b->cCollision->radius + e->cCollision->radius)
             {
-                // call onCollision for both entities
+
                 // destroy both entities
                 b->destroy();
+                spawnSmallEnemies(e);
+                // increase the player's score
+                m_player->cScore->score += e->cScore->score;
+
                 e->destroy();
+
+                std::cout << "Playerscore: " << m_player->cScore->score << std::endl;
             }
         }
     }
