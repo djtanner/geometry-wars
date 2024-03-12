@@ -47,7 +47,7 @@ void Game::run()
 
         sRender();
 
-        m_currenFrame++;
+        m_currentFrame++;
     }
 }
 
@@ -157,20 +157,20 @@ void Game::sLifespan()
 void Game::sCollision()
 {
 
-    for (auto b : m_entities.getEntities("bullet"))
-    {
-        for (auto e : m_entities.getEntities("enemy"))
-        {
-            // check if circles are overlapping for collisions
-            if (b->cTransform->pos.distance(e->cTransform->pos) < b->cShape->radius + e->cShape->radius)
-            {
-                // call onCollision for both entities
-                // destroy both entities
-                b->destroy();
-                e->destroy();
-            }
-        }
-    }
+    /**  for (auto b : m_entities.getEntities("bullet"))
+       {
+           for (auto e : m_entities.getEntities("enemy"))
+           {
+               // check if circles are overlapping for collisions
+               if (b->cTransform->pos.dist(e->cTransform->pos) < b->cShape->radius + e->cShape->radius)
+               {
+                   // call onCollision for both entities
+                   // destroy both entities
+                   b->destroy();
+                   e->destroy();
+               }
+           }
+       }*/
     // to do: update the collision of all entities
     // use collision  radius, not shape radius
     // for all entities:

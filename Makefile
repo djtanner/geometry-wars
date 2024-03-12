@@ -1,7 +1,7 @@
 CXX		:=	g++
 OUTPUT	:=	sfmlgame
 
-SFML_DIR	:=	/opt/homebrew/Cellar/sfml/2.6.1/
+SFML_DIR	:=	/opt/homebrew/Cellar/sfml/2.6.1
 
 CXX_FLAGS	:=	-std=c++17 -O3
 INCLUDES	:=	-I./ -I$(SFML_DIR)/include
@@ -13,7 +13,7 @@ OBJ_FILES	:=	$(SRC_FILES:.cpp=.o)
 all: $(OUTPUT)
 
 $(OUTPUT): $(OBJ_FILES) Makefile
-	$(CXX) $(OBJ_FILES) $(LDFLAGS) -o ./bin/$@
+	$(CXX) $(OBJ_FILES) $(LDFLAGS) -o $@
 
 .cpp.o:
 	$(CXX) -c $(CXX_FLAGS) $(INCLUDES) -c $< -o $@
@@ -22,4 +22,4 @@ clean:
 	rm -f $(OBJ_SFMLGAME) ./bin/sfmlgame
 
 run: $(OUTPUT)
-	cd bin && .sfmlgame && cd ..
+	.sfmlgame && cd ..
