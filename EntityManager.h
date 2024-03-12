@@ -3,12 +3,14 @@
 #include "Entity.h"
 #include <vector>
 #include <map>
+#include <string>
 
 typedef std::vector<std::shared_ptr<Entity>> EntityVec;
 typedef std::map<std::string, EntityVec> EntityMap;
 
 class EntityManager
 {
+private:
     EntityVec m_entities;
     EntityVec m_entitiesToAdd;
     EntityMap m_entityMap;
