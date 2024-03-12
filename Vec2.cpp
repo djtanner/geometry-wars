@@ -72,3 +72,8 @@ float Vec2::dist(const Vec2 &rhs) const
 {
     return sqrt(pow(x - rhs.x, 2) + pow(y - rhs.y, 2));
 }
+
+Vec2 Vec2::normalize() const
+{
+    return *this / sqrt(x * x + y * y);
+}

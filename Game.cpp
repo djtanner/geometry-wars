@@ -112,10 +112,16 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
 void Game::spawnBullet(std::shared_ptr<Entity> e, const Vec2 &target)
 {
     // to do: spawn a bullet from the entity at the mouse position
-    // bullet speed is given as a scalar speed, set the velocity using normalized vector calculation
+
     std::cout << "Spawning bullet" << std::endl;
     auto bullet = m_entities.addEntity("bullet");
-    bullet->cTransform = std::make_shared<CTransform>(target, Vec2(1.0f, 1.0f), 0.0f);
+
+    // bullet speed is given as a scalar speed, set the velocity using normalized vector calculation
+    Vec2 dir = target - m_player->cTransform->pos;
+    dir.normalize();
+
+    // spawn the bullet from the player position
+    bullet->cTransform = std::make_shared<CTransform>(m_player->cTransform->pos, dir * 0.02, 0.0f);
     bullet->cShape = std::make_shared<CShape>(8.0f, 8, sf::Color(10, 10, 10), sf::Color(0, 255, 0), 4.0f);
 }
 
@@ -156,6 +162,13 @@ void Game::sMovement()
     // sample movement and speed update
     m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
     m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
+
+    // bullet movement
+    for (auto e : m_entities.getEntities("bullet"))
+    {
+        e->cTransform->pos.x += e->cTransform->velocity.x;
+        e->cTransform->pos.y += e->cTransform->velocity.y;
+    }
 }
 
 void Game::sLifespan()
