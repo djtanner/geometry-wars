@@ -31,6 +31,8 @@ void EntityManager::removeDeadEntities(EntityVec &vec)
                    return !entity->isActive();
                }),
                vec.end());*/
+
+    // use std::remove_if to move all dead entities to the end of the vector
 }
 
 std::shared_ptr<Entity> EntityManager::addEntity(const std::string &tag)

@@ -111,6 +111,10 @@ void Game::spawnBullet(std::shared_ptr<Entity> e, const Vec2 &target)
 {
     // to do: spawn a bullet from the entity at the mouse position
     // bullet speed is given as a scalar speed, set the velocity using normalized vector calculation
+
+    auto bullet = m_entities.addEntity("bullet");
+    bullet->cTransform = std::make_shared<CTransform>(target, Vec2(1.0f, 1.0f), 0.0f);
+    bullet->cShape = std::make_shared<CShape>(8.0f, 8, sf::Color(10, 10, 10), sf::Color(0, 255, 0), 4.0f);
 }
 
 // spawn a special weapon from the entity
@@ -123,8 +127,17 @@ void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
 // update the movement of all entities
 void Game::sMovement()
 {
-    // to do: update the movement of all entities
+    // to do: update the movement of all entities (not just player)
     // reaad the m_player->cInput to determine if player is moving
+
+    // clear velocity at the start of the frame
+    m_player->cTransform->velocity = {0.0f, 0.0f};
+
+    // implement player movement
+    if (m_player->cInput->up)
+    {
+        m_player->cTransform->velocity.y = -5.0f;
+    }
 
     // sample movement and speed update
     m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
@@ -143,6 +156,21 @@ void Game::sLifespan()
 
 void Game::sCollision()
 {
+
+    for (auto b : m_entities.getEntities("bullet"))
+    {
+        for (auto e : m_entities.getEntities("enemy"))
+        {
+            // check if circles are overlapping for collisions
+            if (b->cTransform->pos.distance(e->cTransform->pos) < b->cShape->radius + e->cShape->radius)
+            {
+                // call onCollision for both entities
+                // destroy both entities
+                b->destroy();
+                e->destroy();
+            }
+        }
+    }
     // to do: update the collision of all entities
     // use collision  radius, not shape radius
     // for all entities:
@@ -209,7 +237,8 @@ void Game::sUserInput()
             {
             case sf::Keyboard::W:
                 std::cout << "W key was pressed" << std::endl;
-                // todo : set palyers input component to move up
+
+                m_player->cInput->up = true;
                 break;
 
             default:
@@ -225,6 +254,7 @@ void Game::sUserInput()
             case sf::Keyboard::W:
                 std::cout << "W key was released" << std::endl;
                 // TODO: set players input component to stop moving up
+                m_player->cInput->up = false;
                 break;
             default:
 
@@ -237,6 +267,7 @@ void Game::sUserInput()
             std::cout << "Left button clicked at " << event.mouseButton.x << " " << event.mouseButton.y << std::endl;
 
             // call spawnbullet here
+            spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
         }
 
         if (event.mouseButton.button == sf::Mouse::Right)
