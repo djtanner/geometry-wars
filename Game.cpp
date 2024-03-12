@@ -39,6 +39,7 @@ void Game::run()
 
         if (!m_paused)
         {
+            sLifespan();
             sEnemySpawner();
             sMovement();
             sCollision();
@@ -120,9 +121,10 @@ void Game::spawnBullet(std::shared_ptr<Entity> e, const Vec2 &target)
     Vec2 dir = target - m_player->cTransform->pos;
     dir.normalize();
 
-    // spawn the bullet from the player position
+    // spawn the bullet from the player position to the mouse position
     bullet->cTransform = std::make_shared<CTransform>(m_player->cTransform->pos, dir * 0.02, 0.0f);
-    bullet->cShape = std::make_shared<CShape>(8.0f, 8, sf::Color(10, 10, 10), sf::Color(0, 255, 0), 4.0f);
+    bullet->cShape = std::make_shared<CShape>(8.0f, 8, sf::Color(255, 255, 255), sf::Color(0, 255, 0), 4.0f);
+    bullet->cLifespan = std::make_shared<CLifespan>(60);
 }
 
 // spawn a special weapon from the entity
@@ -178,7 +180,31 @@ void Game::sLifespan()
     // if no lifespan component, skip it
     // if an entity has a lifespan, decrement it
     // if it has lifespan and is alive, scale its alpha channel to represent remaining lifespan
-    // if the lifespan reaches 0, destroy the entity
+    //
+
+    for (auto e : m_entities.getEntities())
+    {
+        if (!e->cLifespan)
+        {
+            continue;
+        }
+
+        else if (e->cLifespan->remaining > 0)
+        {
+            e->cLifespan->remaining--;
+
+            if (e->cLifespan->remaining <= 0)
+            {
+                e->destroy();
+                // std::cout << "Destroying entity" << std::endl;
+            }
+            else
+            {
+                // scale alpha channel to represent remaining lifespan
+                e->cShape->circle.setFillColor(sf::Color(e->cShape->circle.getFillColor().r, e->cShape->circle.getFillColor().g, e->cShape->circle.getFillColor().b, e->cLifespan->remaining * 255 / e->cLifespan->total));
+            }
+        }
+    }
 }
 
 void Game::sCollision()
@@ -232,6 +258,10 @@ void Game::sRender()
     // need to add all entities
     for (auto e : m_entities.getEntities())
     {
+        if (!e->isActive())
+        {
+            continue;
+        }
         e->cShape->circle.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
 
         // set rotation and shape based on transform angle
@@ -240,8 +270,6 @@ void Game::sRender()
 
         m_window.draw(e->cShape->circle);
     }
-
-    // draw the entities sf circle shape
 
     m_window.display();
 }

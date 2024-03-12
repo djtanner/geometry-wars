@@ -1,4 +1,5 @@
 #include "EntityManager.h"
+#include <iostream>
 
 EntityManager::EntityManager()
     : m_totalEntities(0)
@@ -37,9 +38,7 @@ void EntityManager::removeDeadEntities(EntityVec &vec)
         if (!e->isActive())
         {
             // use removeif to remove the entity from the vector
-            vec.erase(std::remove_if(vec.begin(), vec.end(), [](std::shared_ptr<Entity> e)
-                                     { return !e->isActive(); }),
-                      vec.end());
+            std::cout << "Removing entity with id: " << e->id() << std::endl;
         }
     }
 }
