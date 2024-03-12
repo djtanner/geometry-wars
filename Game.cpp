@@ -82,8 +82,7 @@ void Game::spawnPlayer()
 // spawn enemy at random position
 void Game::spawnEnemy()
 {
-    std::cout << "Spawning enemy" << std::endl;
-
+    // to do: finish adding all properties of the enemy with the correct values from the config
     auto entity = m_entities.addEntity("enemy");
     // spawn enemy within bounds of window
     float ex = rand() % m_window.getSize().x;
@@ -114,7 +113,7 @@ void Game::spawnBullet(std::shared_ptr<Entity> e, const Vec2 &target)
 {
     // to do: spawn a bullet from the entity at the mouse position
     // bullet speed is given as a scalar speed, set the velocity using normalized vector calculation
-
+    std::cout << "Spawning bullet" << std::endl;
     auto bullet = m_entities.addEntity("bullet");
     bullet->cTransform = std::make_shared<CTransform>(target, Vec2(1.0f, 1.0f), 0.0f);
     bullet->cShape = std::make_shared<CShape>(8.0f, 8, sf::Color(10, 10, 10), sf::Color(0, 255, 0), 4.0f);
@@ -140,6 +139,18 @@ void Game::sMovement()
     if (m_player->cInput->up)
     {
         m_player->cTransform->velocity.y = -5.0f;
+    }
+    if (m_player->cInput->down)
+    {
+        m_player->cTransform->velocity.y = 5.0f;
+    }
+    if (m_player->cInput->left)
+    {
+        m_player->cTransform->velocity.x = -5.0f;
+    }
+    if (m_player->cInput->right)
+    {
+        m_player->cTransform->velocity.x = 5.0f;
     }
 
     // sample movement and speed update
@@ -240,9 +251,16 @@ void Game::sUserInput()
             switch (event.key.code)
             {
             case sf::Keyboard::W:
-                std::cout << "W key was pressed" << std::endl;
-
                 m_player->cInput->up = true;
+                break;
+            case sf::Keyboard::S:
+                m_player->cInput->down = true;
+                break;
+            case sf::Keyboard::A:
+                m_player->cInput->left = true;
+                break;
+            case sf::Keyboard::D:
+                m_player->cInput->right = true;
                 break;
 
             default:
@@ -256,12 +274,18 @@ void Game::sUserInput()
             switch (event.key.code)
             {
             case sf::Keyboard::W:
-                std::cout << "W key was released" << std::endl;
-                // TODO: set players input component to stop moving up
                 m_player->cInput->up = false;
                 break;
+            case sf::Keyboard::S:
+                m_player->cInput->down = false;
+                break;
+            case sf::Keyboard::A:
+                m_player->cInput->left = false;
+                break;
+            case sf::Keyboard::D:
+                m_player->cInput->right = false;
+                break;
             default:
-
                 break;
             }
         }
