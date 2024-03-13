@@ -206,9 +206,6 @@ void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
 // update the movement of all entities
 void Game::sMovement()
 {
-    // to do: update the movement of all entities (not just player)
-    // reaad the m_player->cInput to determine if player is moving
-
     // clear velocity at the start of the frame
     m_player->cTransform->velocity = {0.0f, 0.0f};
 
@@ -302,7 +299,6 @@ void Game::sLifespan()
     // if no lifespan component, skip it
     // if an entity has a lifespan, decrement it
     // if it has lifespan and is alive, scale its alpha channel to represent remaining lifespan
-    //
 
     for (auto e : m_entities.getEntities())
     {
@@ -416,7 +412,6 @@ void Game::sEnemySpawner()
 
 void Game::sRender()
 {
-    // TODO: change code to draw all of the entities
 
     m_window.clear();
 
@@ -427,7 +422,7 @@ void Game::sRender()
     m_player->cShape->circle.setRotation(m_player->cTransform->angle);
     m_window.draw(m_player->cShape->circle);
 
-    // need to add all entities
+    // add all entities
     for (auto e : m_entities.getEntities())
     {
         if (!e->isActive())
@@ -442,6 +437,11 @@ void Game::sRender()
 
         m_window.draw(e->cShape->circle);
     }
+
+    // draw the score
+    m_text.setString("Score: " + std::to_string(m_player->cScore->score));
+    m_window.draw(m_text);
+    m_text.setPosition(0, 0);
 
     m_window.display();
 }
