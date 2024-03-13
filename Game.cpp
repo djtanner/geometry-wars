@@ -187,6 +187,9 @@ void Game::sMovement()
     m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
     m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
 
+    // keep the player within the window bounds
+    PlayerBounds();
+
     // bullet movement
     for (auto e : m_entities.getEntities("bullet"))
     {
@@ -207,6 +210,30 @@ void Game::sMovement()
 
         e->cTransform->pos.x += e->cTransform->velocity.x;
         e->cTransform->pos.y += e->cTransform->velocity.y;
+    }
+}
+
+void Game::PlayerBounds()
+{
+    // keep the player within the window bounds
+    if (m_player->cTransform->pos.x - m_player->cCollision->radius < 0)
+    {
+        m_player->cTransform->pos.x = m_player->cCollision->radius;
+    }
+
+    if (m_player->cTransform->pos.x + m_player->cCollision->radius > m_window.getSize().x)
+    {
+        m_player->cTransform->pos.x = m_window.getSize().x - m_player->cCollision->radius;
+    }
+
+    if (m_player->cTransform->pos.y - m_player->cCollision->radius < 0)
+    {
+        m_player->cTransform->pos.y = m_player->cCollision->radius;
+    }
+
+    if (m_player->cTransform->pos.y + m_player->cCollision->radius > m_window.getSize().y)
+    {
+        m_player->cTransform->pos.y = m_window.getSize().y - m_player->cCollision->radius;
     }
 }
 
