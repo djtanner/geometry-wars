@@ -13,16 +13,31 @@ void Game::init(const std::string &path)
     // TODO: read in config file here, use premade PlayerConfig, EnemyConfig, and BulletConfig structs
 
     std::ifstream fin(path);
+    std::string skip;
+    int width, height, frameLimit;
+    bool fullscreen;
 
+    if (fin >> skip)
+    {
+        fin >> width >> height >> frameLimit >> fullscreen;
+    }
     // need to handle the first two lines of the config file
-    /*
-        fin >> m_playerConfig.SR >> m_playerConfig.CR >> m_playerConfig.FR >> m_playerConfig.FG >> m_playerConfig.FB >> m_playerConfig.OR >> m_playerConfig.OG >> m_playerConfig.OB >> m_playerConfig.OT >> m_playerConfig.V >> m_playerConfig.S;
-        fin >> m_enemyConfig.SR >> m_enemyConfig.CR >> m_enemyConfig.OR >> m_enemyConfig.OG >> m_enemyConfig.OB >> m_enemyConfig.OT >> m_enemyConfig.VMIN >> m_enemyConfig.VMAX >> m_enemyConfig.L >> m_enemyConfig.SI >> m_enemyConfig.SMIN >> m_enemyConfig.SMAX;
-        fin >> m_bulletConfig.SR >> m_bulletConfig.CR >> m_bulletConfig.FR >> m_bulletConfig.FG >> m_bulletConfig.FB >> m_bulletConfig.OR >> m_bulletConfig.OG >> m_bulletConfig.OB >> m_bulletConfig.OT >> m_bulletConfig.V >> m_bulletConfig.L >> m_bulletConfig.S;
-    */
+
+    //   fin >> m_playerConfig.SR >> m_playerConfig.CR >> m_playerConfig.FR >> m_playerConfig.FG >> m_playerConfig.FB >> m_playerConfig.OR >> m_playerConfig.OG >> m_playerConfig.OB >> m_playerConfig.OT >> m_playerConfig.V >> m_playerConfig.S;
+    //  fin >> m_enemyConfig.SR >> m_enemyConfig.CR >> m_enemyConfig.OR >> m_enemyConfig.OG >> m_enemyConfig.OB >> m_enemyConfig.OT >> m_enemyConfig.VMIN >> m_enemyConfig.VMAX >> m_enemyConfig.L >> m_enemyConfig.SI >> m_enemyConfig.SMIN >> m_enemyConfig.SMAX;
+    //    fin >> m_bulletConfig.SR >> m_bulletConfig.CR >> m_bulletConfig.FR >> m_bulletConfig.FG >> m_bulletConfig.FB >> m_bulletConfig.OR >> m_bulletConfig.OG >> m_bulletConfig.OB >> m_bulletConfig.OT >> m_bulletConfig.V >> m_bulletConfig.L >> m_bulletConfig.S;
+
     // setup deafult window parameters
-    m_window.create(sf::VideoMode(1280, 720), "SFML window");
-    m_window.setFramerateLimit(60);
+    if (!fullscreen)
+    {
+        m_window.create(sf::VideoMode(width, height), "SFML window");
+    }
+    else
+    {
+        m_window.create(sf::VideoMode(width, height), "SFML window", sf::Style::Fullscreen);
+    }
+
+    m_window.setFramerateLimit(frameLimit);
 
     spawnPlayer();
 }
@@ -200,6 +215,7 @@ void Game::sMovement()
     // enemy movement
     for (auto e : m_entities.getEntities("enemy"))
     {
+        // bounce the enemy off the walls
         if (e->cTransform->pos.x - e->cCollision->radius < 0 || e->cTransform->pos.x + e->cCollision->radius > m_window.getSize().x)
         {
             e->cTransform->velocity.x *= -1;
@@ -426,7 +442,9 @@ void Game::sUserInput()
             case sf::Keyboard::D:
                 m_player->cInput->right = true;
                 break;
-
+            case sf::Keyboard::Escape:
+                m_running = false;
+                break;
             default:
                 break;
             }

@@ -9,7 +9,7 @@ EntityManager::EntityManager()
 void EntityManager::update()
 {
     // add entities from m_entitiesToAdd to the proper locations
-    // add them to the vector of all entiteis
+    // add them to the vector of all entities
     // add them to the vector inside the map with the tag as the key
 
     for (auto e : m_entitiesToAdd)
