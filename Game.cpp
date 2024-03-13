@@ -79,6 +79,8 @@ void Game::spawnPlayer()
 
     entity->cScore = std::make_shared<CScore>(0);
 
+    entity->cCollision = std::make_shared<CCollision>(32.0f);
+
     m_player = entity;
 }
 
@@ -244,7 +246,7 @@ void Game::sLifespan()
 
 void Game::sCollision()
 {
-
+    // bullets colliding with large enemies
     for (auto b : m_entities.getEntities("bullet"))
     {
         for (auto e : m_entities.getEntities("enemy"))
@@ -271,6 +273,7 @@ void Game::sCollision()
         }
     }
 
+    // bullets colliding with small enemies
     for (auto b : m_entities.getEntities("bullet"))
     {
         for (auto e : m_entities.getEntities("smallenemy"))
@@ -297,12 +300,23 @@ void Game::sCollision()
         }
     }
 
-    // to do: update the collision of all entities
-    // use collision  radius, not shape radius
-    // for all entities:
-    // if no collision component, skip it
-    // if an entity has a collision, check for collision with all other entities
-    // if a collision occurs, call the onCollision function of both entities
+    // check if enemy collides with player
+    for (auto e : m_entities.getEntities("enemy"))
+    {
+        if (!e->cCollision)
+        {
+            continue;
+        }
+
+        if (m_player->cTransform->pos.dist(e->cTransform->pos) < m_player->cCollision->radius + e->cCollision->radius)
+        {
+            // destroy the enemy
+            e->destroy();
+            // destroy the player and respawn in center
+            m_player->destroy();
+            spawnPlayer();
+        }
+    }
 }
 
 void Game::sEnemySpawner()
