@@ -13,13 +13,25 @@ void Game::init(const std::string &path)
     // TODO: read in config file here, use premade PlayerConfig, EnemyConfig, and BulletConfig structs
 
     std::ifstream fin(path);
-    std::string skip;
+    std::string next;
     int width, height, frameLimit;
     bool fullscreen;
+    std::string fontPath;
+    int fontSize, fontR, fontG, fontB;
 
-    if (fin >> skip)
+    // Read in Window from Config
+    if (fin >> next)
     {
         fin >> width >> height >> frameLimit >> fullscreen;
+    }
+    // Read in font from Config
+    if (fin >> next)
+    {
+        fin >> fontPath >> fontSize >> fontR >> fontG >> fontB;
+        m_font.loadFromFile(fontPath);
+        m_text.setFont(m_font);
+        m_text.setCharacterSize(fontSize);
+        m_text.setFillColor(sf::Color(fontR, fontG, fontB));
     }
     // need to handle the first two lines of the config file
 
@@ -415,8 +427,6 @@ void Game::sRender()
 
 void Game::sUserInput()
 {
-
-    // TODO: handle user input here, do not implement player's movement logic here
 
     sf::Event event;
     while (m_window.pollEvent(event))
