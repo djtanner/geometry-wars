@@ -37,7 +37,9 @@ class Game
     int m_lastEnemySpawnTime = 0;
     bool m_paused = false; // whether we update game logic
     bool m_running = true; // whether we continue to run the game loop
-
+    bool m_weaponAvailable = true;
+    int m_weaponCooldown = 120;
+    int m_weaponCooldownTimer = 0;
     std::shared_ptr<Entity> m_player;
 
     void init(const std::string &config); // initialize the GameState with a config file path

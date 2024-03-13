@@ -70,6 +70,11 @@ void Game::run()
             sEnemySpawner();
             sMovement();
             sCollision();
+
+            if (m_currentFrame - m_weaponCooldownTimer > m_weaponCooldown)
+            {
+                m_weaponAvailable = true;
+            }
         }
 
         sUserInput();
@@ -179,9 +184,7 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
 // spawn a bullet from the entity at the mouse position
 void Game::spawnBullet(std::shared_ptr<Entity> e, const Vec2 &target)
 {
-    // to do: spawn a bullet from the entity at the mouse position
-
-    std::cout << "Spawning bullet" << std::endl;
+    // spawn a bullet from the entity at the mouse position
     auto bullet = m_entities.addEntity("bullet");
 
     // bullet speed is given as a scalar speed, set the velocity using normalized vector calculation
@@ -199,8 +202,36 @@ void Game::spawnBullet(std::shared_ptr<Entity> e, const Vec2 &target)
 // spawn a special weapon from the entity
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
 {
-    // to do: spawn a special weapon from the entity
-    // special weapon speed is given as a scalar speed, set the velocity using normalized vector calculation
+
+    for (size_t i = 0; i < 15; i++)
+    {
+        auto e = m_entities.addEntity("bullet");
+        float angle = 360.0f / 15 * i;
+        float posX = entity->cTransform->pos.x + cos(angle * M_PI / 180.0f) * 50.0f;
+        float posY = entity->cTransform->pos.y + sin(angle * M_PI / 180.0f) * 50.0f;
+        float velocityX = cos(angle * M_PI / 180.0f);
+        float velocityY = sin(angle * M_PI / 180.0f);
+
+        e->cTransform = std::make_shared<CTransform>(Vec2(posX, posY), Vec2(velocityX, velocityY), angle);
+        e->cShape = std::make_shared<CShape>(12, 12, sf::Color::Red, sf::Color::White, 1.0f);
+        e->cCollision = std::make_shared<CCollision>(12);
+        e->cLifespan = std::make_shared<CLifespan>(m_bulletConfig.L);
+    }
+
+    for (size_t i = 0; i < 15; i++)
+    {
+        auto e = m_entities.addEntity("bullet");
+        float angle = 360.0f / 15 * i;
+        float posX = entity->cTransform->pos.x + cos(angle * M_PI / 180.0f) * 60.0f;
+        float posY = entity->cTransform->pos.y + sin(angle * M_PI / 180.0f) * 60.0f;
+        float velocityX = cos(angle * M_PI / 180.0f);
+        float velocityY = sin(angle * M_PI / 180.0f);
+
+        e->cTransform = std::make_shared<CTransform>(Vec2(posX, posY), Vec2(velocityX, velocityY), angle);
+        e->cShape = std::make_shared<CShape>(12, 12, sf::Color::Red, sf::Color::White, 1.0f);
+        e->cCollision = std::make_shared<CCollision>(12);
+        e->cLifespan = std::make_shared<CLifespan>(m_bulletConfig.L);
+    }
 }
 
 // update the movement of all entities
@@ -508,17 +539,22 @@ void Game::sUserInput()
 
         if (event.type == sf::Event::MouseButtonPressed)
         {
-            std::cout << "Left button clicked at " << event.mouseButton.x << " " << event.mouseButton.y << std::endl;
+            //  std::cout << "Left button clicked at " << event.mouseButton.x << " " << event.mouseButton.y << std::endl;
 
             // call spawnbullet here
-            spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
-        }
+            if (event.mouseButton.button == sf::Mouse::Left)
+            {
+                spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
+            }
 
-        if (event.mouseButton.button == sf::Mouse::Right)
-        {
-            std::cout << "Right button clicked at " << event.mouseButton.x << " " << event.mouseButton.y << std::endl;
+            if (event.mouseButton.button == sf::Mouse::Right && m_weaponAvailable)
+            {
+                // std::cout << "Right button clicked at " << event.mouseButton.x << " " << event.mouseButton.y << std::endl;
 
-            // TODO: call spawnSpecialWeapon here
+                spawnSpecialWeapon(m_player);
+                m_weaponAvailable = false;
+                m_weaponCooldownTimer = m_currentFrame;
+            }
         }
     }
 }
