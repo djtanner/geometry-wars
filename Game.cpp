@@ -10,7 +10,7 @@ Game::Game(const std::string &config)
 
 void Game::init(const std::string &path)
 {
-    // TODO: read in config file here, use premade PlayerConfig, EnemyConfig, and BulletConfig structs
+    // Read in config file, use premade PlayerConfig, EnemyConfig, and BulletConfig structs
 
     std::ifstream fin(path);
     std::string next;
@@ -294,7 +294,7 @@ void Game::PlayerBounds()
 
 void Game::sLifespan()
 {
-    // to do: update the lifespan of all entities
+
     // for all entities:
     // if no lifespan component, skip it
     // if an entity has a lifespan, decrement it
@@ -406,7 +406,7 @@ void Game::sEnemySpawner()
     // if the current frame is greater than the last enemy spawn time + the spawn interval, spawn an enemy
     // use m_currentFrame - m_lastEnemySpawnTime to determine how long since last spawn
     // spawning every 3 seconds at 60 fps
-    if (m_currentFrame - m_lastEnemySpawnTime > 3 * 60)
+    if (m_currentFrame - m_lastEnemySpawnTime > m_enemyConfig.SI)
         spawnEnemy();
 }
 
