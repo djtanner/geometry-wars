@@ -404,7 +404,7 @@ void Game::sCollision()
 
                 e->destroy();
 
-                std::cout << "Playerscore: " << m_player->cScore->score << std::endl;
+                // std::cout << "Playerscore: " << m_player->cScore->score << std::endl;
             }
         }
     }
