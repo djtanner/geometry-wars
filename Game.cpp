@@ -103,9 +103,6 @@ void Game::spawnPlayer()
 
     entity->cTransform = std::make_shared<CTransform>(Vec2(mx, my), Vec2(1.0f, 1.0f), 0.0f);
 
-    std::cout << m_playerConfig.FR << " " << m_playerConfig.FG << " " << m_playerConfig.FB << std::endl;
-    std::cout << m_playerConfig.OR << " " << m_playerConfig.OG << " " << m_playerConfig.OB << std::endl;
-
     entity->cShape = std::make_shared<CShape>(m_playerConfig.SR, m_playerConfig.V, sf::Color(m_playerConfig.FR, m_playerConfig.FG, m_playerConfig.FB), sf::Color(m_playerConfig.OR, m_playerConfig.OG, m_playerConfig.OB), m_playerConfig.OT);
 
     entity->cInput = std::make_shared<CInput>();
@@ -380,7 +377,7 @@ void Game::sCollision()
 
                 e->destroy();
 
-                std::cout << "Playerscore: " << m_player->cScore->score << std::endl;
+                // std::cout << "Playerscore: " << m_player->cScore->score << std::endl;
             }
         }
     }
