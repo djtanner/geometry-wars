@@ -103,12 +103,13 @@ void Game::spawnEnemy()
 // spawns the small enemies when a big one explodes
 void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
 {
-    // to do: spawn small enemies around the position of the big enemy
-    std::cout << "Spawning small enemies" << std::endl;
+    // when create the smaller enemy, read the values of the original enemy
+    // spawn a number of small enemies equal to the vertices of the original enemy
+    // set each to same color ,half the size
+    // worth double points
 
-    // get points of the enemy
+    // get number of points of the enemy
     size_t points = e->cShape->circle.getPointCount();
-    std::cout << "Points: " << points << std::endl;
 
     for (size_t i = 0; i < points; i++)
     {
@@ -116,17 +117,15 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
         float angle = 360.0f / points * i;                                      // Calculate angle for even distribution
         float posX = e->cTransform->pos.x + cos(angle * M_PI / 180.0f) * 50.0f; // Adjust radius as needed
         float posY = e->cTransform->pos.y + sin(angle * M_PI / 180.0f) * 50.0f; // Adjust radius as needed
+        float velocityX = cos(angle * M_PI / 180.0f);                           // Calculate x-component based on angle
+        float velocityY = sin(angle * M_PI / 180.0f);                           // Calculate y-component based on angle
 
-        entity->cTransform = std::make_shared<CTransform>(Vec2(posX, posY), Vec2(1.0f, 1.0f), angle);
+        entity->cTransform = std::make_shared<CTransform>(Vec2(posX, posY), Vec2(velocityX, velocityY), angle);
         entity->cShape = std::make_shared<CShape>(16.0f, 8, sf::Color(100, 100, 100), sf::Color(0, 0, 255), 4.0f);
         entity->cCollision = std::make_shared<CCollision>(16.0f);
         entity->cScore = std::make_shared<CScore>(20);
         entity->cLifespan = std::make_shared<CLifespan>(60);
     }
-    // when create the smaller enemy, read the values of the original enemy
-    // spawn a number of small enemies equal to the vertices of the original enemy
-    // set each to same color ,half the size
-    // worth double points
 }
 
 // spawn a bullet from the entity at the mouse position
@@ -189,6 +188,21 @@ void Game::sMovement()
     // bullet movement
     for (auto e : m_entities.getEntities("bullet"))
     {
+        e->cTransform->pos.x += e->cTransform->velocity.x;
+        e->cTransform->pos.y += e->cTransform->velocity.y;
+    }
+
+    // enemy movement
+    for (auto e : m_entities.getEntities("enemy"))
+    {
+
+        e->cTransform->pos.x += e->cTransform->velocity.x;
+        e->cTransform->pos.y += e->cTransform->velocity.y;
+    }
+
+    for (auto e : m_entities.getEntities("smallenemy"))
+    {
+
         e->cTransform->pos.x += e->cTransform->velocity.x;
         e->cTransform->pos.y += e->cTransform->velocity.y;
     }
