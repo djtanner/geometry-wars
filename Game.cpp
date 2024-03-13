@@ -60,9 +60,6 @@ void Game::init(const std::string &path)
 void Game::run()
 {
 
-    // TO DO: add pause functionality here, some systems should function while paused (rendering), others should not
-    // (movement,input)
-
     while (m_running)
     {
         m_entities.update();
@@ -73,9 +70,9 @@ void Game::run()
             sEnemySpawner();
             sMovement();
             sCollision();
-            sUserInput();
         }
 
+        sUserInput();
         sRender();
 
         m_currentFrame++;
@@ -141,7 +138,7 @@ void Game::spawnEnemy()
     entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(velocity, velocity), 0.0f);
     entity->cShape = std::make_shared<CShape>(m_enemyConfig.SR, numPoints, sf::Color(r, g, b), sf::Color(b, g, r), m_enemyConfig.OT);
     entity->cCollision = std::make_shared<CCollision>(m_enemyConfig.CR);
-    entity->cScore = std::make_shared<CScore>(10);
+    entity->cScore = std::make_shared<CScore>(100 * numPoints);
     // record when the most recent enemy was spawned
     m_lastEnemySpawnTime = m_currentFrame;
 }
@@ -156,6 +153,11 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
 
     // get number of points of the enemy
     size_t points = e->cShape->circle.getPointCount();
+    float r = e->cShape->circle.getRadius() / 2;
+    sf::Color fill = e->cShape->circle.getFillColor();
+    sf::Color outline = e->cShape->circle.getOutlineColor();
+    int thickness = e->cShape->circle.getOutlineThickness();
+    float cr = e->cCollision->radius / 2;
 
     for (size_t i = 0; i < points; i++)
     {
@@ -167,10 +169,10 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
         float velocityY = sin(angle * M_PI / 180.0f);                           // Calculate y-component based on angle
 
         entity->cTransform = std::make_shared<CTransform>(Vec2(posX, posY), Vec2(velocityX, velocityY), angle);
-        entity->cShape = std::make_shared<CShape>(16.0f, 8, sf::Color(100, 100, 100), sf::Color(0, 0, 255), 4.0f);
-        entity->cCollision = std::make_shared<CCollision>(16.0f);
-        entity->cScore = std::make_shared<CScore>(20);
-        entity->cLifespan = std::make_shared<CLifespan>(60);
+        entity->cShape = std::make_shared<CShape>(r / 2, points, fill, outline, thickness);
+        entity->cCollision = std::make_shared<CCollision>(cr);
+        entity->cScore = std::make_shared<CScore>(2 * e->cScore->score);
+        entity->cLifespan = std::make_shared<CLifespan>(m_enemyConfig.L);
     }
 }
 
@@ -190,8 +192,8 @@ void Game::spawnBullet(std::shared_ptr<Entity> e, const Vec2 &target)
     // spawn the bullet from the player position to the mouse position
     bullet->cTransform = std::make_shared<CTransform>(m_player->cTransform->pos, bulletVelocity, 0.0f);
     bullet->cShape = std::make_shared<CShape>(m_bulletConfig.SR, m_bulletConfig.V, sf::Color(m_bulletConfig.FR, m_bulletConfig.FG, m_bulletConfig.FB), sf::Color(m_bulletConfig.OR, m_bulletConfig.OG, m_bulletConfig.OB), m_bulletConfig.OT);
-    bullet->cLifespan = std::make_shared<CLifespan>(60);
-    bullet->cCollision = std::make_shared<CCollision>(8.0f);
+    bullet->cLifespan = std::make_shared<CLifespan>(m_bulletConfig.L);
+    bullet->cCollision = std::make_shared<CCollision>(m_bulletConfig.CR);
 }
 
 // spawn a special weapon from the entity
@@ -228,7 +230,7 @@ void Game::sMovement()
         m_player->cTransform->velocity.x = 5.0f;
     }
 
-    // sample movement and speed update
+    // movement and speed update
     m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
     m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
 
@@ -260,6 +262,7 @@ void Game::sMovement()
         e->cTransform->pos.y += e->cTransform->velocity.y;
     }
 
+    // small enemy movement
     for (auto e : m_entities.getEntities("smallenemy"))
     {
 
@@ -472,6 +475,9 @@ void Game::sUserInput()
                 break;
             case sf::Keyboard::Escape:
                 m_running = false;
+                break;
+            case sf::Keyboard::P:
+                setPaused(!m_paused);
                 break;
             default:
                 break;
