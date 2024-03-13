@@ -185,9 +185,10 @@ void Game::spawnBullet(std::shared_ptr<Entity> e, const Vec2 &target)
     // bullet speed is given as a scalar speed, set the velocity using normalized vector calculation
     Vec2 dir = target - m_player->cTransform->pos;
     dir.normalize();
+    Vec2 bulletVelocity = dir * m_bulletConfig.S;
 
     // spawn the bullet from the player position to the mouse position
-    bullet->cTransform = std::make_shared<CTransform>(m_player->cTransform->pos, dir * 0.02, 0.0f);
+    bullet->cTransform = std::make_shared<CTransform>(m_player->cTransform->pos, bulletVelocity, 0.0f);
     bullet->cShape = std::make_shared<CShape>(m_bulletConfig.SR, m_bulletConfig.V, sf::Color(m_bulletConfig.FR, m_bulletConfig.FG, m_bulletConfig.FB), sf::Color(m_bulletConfig.OR, m_bulletConfig.OG, m_bulletConfig.OB), m_bulletConfig.OT);
     bullet->cLifespan = std::make_shared<CLifespan>(60);
     bullet->cCollision = std::make_shared<CCollision>(8.0f);
