@@ -106,6 +106,23 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
     // to do: spawn small enemies around the position of the big enemy
     std::cout << "Spawning small enemies" << std::endl;
 
+    // get points of the enemy
+    size_t points = e->cShape->circle.getPointCount();
+    std::cout << "Points: " << points << std::endl;
+
+    for (size_t i = 0; i < points; i++)
+    {
+        auto entity = m_entities.addEntity("smallenemy");
+        float angle = 360.0f / points * i;                                      // Calculate angle for even distribution
+        float posX = e->cTransform->pos.x + cos(angle * M_PI / 180.0f) * 50.0f; // Adjust radius as needed
+        float posY = e->cTransform->pos.y + sin(angle * M_PI / 180.0f) * 50.0f; // Adjust radius as needed
+
+        entity->cTransform = std::make_shared<CTransform>(Vec2(posX, posY), Vec2(1.0f, 1.0f), angle);
+        entity->cShape = std::make_shared<CShape>(16.0f, 8, sf::Color(100, 100, 100), sf::Color(0, 0, 255), 4.0f);
+        entity->cCollision = std::make_shared<CCollision>(16.0f);
+        entity->cScore = std::make_shared<CScore>(20);
+        entity->cLifespan = std::make_shared<CLifespan>(60);
+    }
     // when create the smaller enemy, read the values of the original enemy
     // spawn a number of small enemies equal to the vertices of the original enemy
     // set each to same color ,half the size
@@ -239,6 +256,33 @@ void Game::sCollision()
             }
         }
     }
+
+    for (auto b : m_entities.getEntities("bullet"))
+    {
+        for (auto e : m_entities.getEntities("smallenemy"))
+        {
+            if (!e->cCollision)
+            {
+                continue;
+            }
+
+            // check if circles are overlapping for collisions
+            if (b->cTransform->pos.dist(e->cTransform->pos) < b->cCollision->radius + e->cCollision->radius)
+            {
+
+                // destroy both entities
+                b->destroy();
+
+                // increase the player's score
+                m_player->cScore->score += e->cScore->score;
+
+                e->destroy();
+
+                std::cout << "Playerscore: " << m_player->cScore->score << std::endl;
+            }
+        }
+    }
+
     // to do: update the collision of all entities
     // use collision  radius, not shape radius
     // for all entities:
