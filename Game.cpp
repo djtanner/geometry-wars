@@ -38,9 +38,9 @@ void Game::init(const std::string &path)
     {
         fin >> m_playerConfig.SR >> m_playerConfig.CR >> m_playerConfig.FR >> m_playerConfig.FG >> m_playerConfig.FB >> m_playerConfig.OR >> m_playerConfig.OG >> m_playerConfig.OB >> m_playerConfig.OT >> m_playerConfig.V >> m_playerConfig.S;
         fin >> next;
-        fin >> m_enemyConfig.SR >> m_enemyConfig.CR >> m_enemyConfig.OR >> m_enemyConfig.OG >> m_enemyConfig.OB >> m_enemyConfig.OT >> m_enemyConfig.VMIN >> m_enemyConfig.VMAX >> m_enemyConfig.L >> m_enemyConfig.SI >> m_enemyConfig.SMIN >> m_enemyConfig.SMAX;
+        fin >> m_enemyConfig.SR >> m_enemyConfig.CR >> m_enemyConfig.SMIN >> m_enemyConfig.SMAX >> m_enemyConfig.OR >> m_enemyConfig.OG >> m_enemyConfig.OB >> m_enemyConfig.OT >> m_enemyConfig.VMIN >> m_enemyConfig.VMAX >> m_enemyConfig.L >> m_enemyConfig.SI;
         fin >> next;
-        fin >> m_bulletConfig.SR >> m_bulletConfig.CR >> m_bulletConfig.FR >> m_bulletConfig.FG >> m_bulletConfig.FB >> m_bulletConfig.OR >> m_bulletConfig.OG >> m_bulletConfig.OB >> m_bulletConfig.OT >> m_bulletConfig.V >> m_bulletConfig.L >> m_bulletConfig.S;
+        fin >> m_bulletConfig.SR >> m_bulletConfig.CR >> m_bulletConfig.S >> m_bulletConfig.FR >> m_bulletConfig.FG >> m_bulletConfig.FB >> m_bulletConfig.OR >> m_bulletConfig.OG >> m_bulletConfig.OB >> m_bulletConfig.OT >> m_bulletConfig.V >> m_bulletConfig.L;
     }
     // setup deafult window parameters
     if (!fullscreen)
@@ -90,8 +90,6 @@ void Game::setPaused(bool paused)
 // respawn the player in the middle of the screen
 void Game::spawnPlayer()
 {
-    // to do : finish adding all properties of the plaeyr with the correct values from the config
-    // currently a sample is hardcoded, but we want to read from the config file (like m_playerConfig.V instead of 8)
 
     // we create every entity by calling EntityManager.addEntity(tag)
 
@@ -120,16 +118,29 @@ void Game::spawnPlayer()
 // spawn enemy at random position
 void Game::spawnEnemy()
 {
-    // to do: finish adding all properties of the enemy with the correct values from the config
+
     auto entity = m_entities.addEntity("enemy");
     // spawn enemy within bounds of window
     float ex = rand() % m_window.getSize().x;
     float ey = rand() % m_window.getSize().y;
 
-    // hardcode example for now
-    entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(1.0f, 1.0f), 0.0f);
-    entity->cShape = std::make_shared<CShape>(32.0f, 8, sf::Color(10, 10, 10), sf::Color(0, 0, 255), 4.0f);
-    entity->cCollision = std::make_shared<CCollision>(32.0f);
+    // random number of vertices for each enemy between VMIN and VMAX
+    int numPoints = rand() % (m_enemyConfig.VMAX - m_enemyConfig.VMIN) + m_enemyConfig.VMIN;
+
+    // random velocity for each enemy between SMIN and SMAX
+    float range = m_enemyConfig.SMAX - m_enemyConfig.SMIN;
+    float fraction = (float)rand() / RAND_MAX;
+    float velocity = m_enemyConfig.SMIN + fraction * range;
+
+    // random color
+    int r = rand() % 255;
+    int g = rand() % 255;
+    int b = rand() % 255;
+
+    // add components to enemy
+    entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(velocity, velocity), 0.0f);
+    entity->cShape = std::make_shared<CShape>(m_enemyConfig.SR, numPoints, sf::Color(r, g, b), sf::Color(b, g, r), m_enemyConfig.OT);
+    entity->cCollision = std::make_shared<CCollision>(m_enemyConfig.CR);
     entity->cScore = std::make_shared<CScore>(10);
     // record when the most recent enemy was spawned
     m_lastEnemySpawnTime = m_currentFrame;
@@ -177,7 +188,7 @@ void Game::spawnBullet(std::shared_ptr<Entity> e, const Vec2 &target)
 
     // spawn the bullet from the player position to the mouse position
     bullet->cTransform = std::make_shared<CTransform>(m_player->cTransform->pos, dir * 0.02, 0.0f);
-    bullet->cShape = std::make_shared<CShape>(8.0f, 8, sf::Color(255, 255, 255), sf::Color(0, 255, 0), 4.0f);
+    bullet->cShape = std::make_shared<CShape>(m_bulletConfig.SR, m_bulletConfig.V, sf::Color(m_bulletConfig.FR, m_bulletConfig.FG, m_bulletConfig.FB), sf::Color(m_bulletConfig.OR, m_bulletConfig.OG, m_bulletConfig.OB), m_bulletConfig.OT);
     bullet->cLifespan = std::make_shared<CLifespan>(60);
     bullet->cCollision = std::make_shared<CCollision>(8.0f);
 }
