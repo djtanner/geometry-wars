@@ -200,6 +200,15 @@ void Game::sMovement()
     // enemy movement
     for (auto e : m_entities.getEntities("enemy"))
     {
+        if (e->cTransform->pos.x - e->cCollision->radius < 0 || e->cTransform->pos.x + e->cCollision->radius > m_window.getSize().x)
+        {
+            e->cTransform->velocity.x *= -1;
+        }
+
+        if (e->cTransform->pos.y - e->cCollision->radius < 0 || e->cTransform->pos.y + e->cCollision->radius > m_window.getSize().y)
+        {
+            e->cTransform->velocity.y *= -1;
+        }
 
         e->cTransform->pos.x += e->cTransform->velocity.x;
         e->cTransform->pos.y += e->cTransform->velocity.y;
